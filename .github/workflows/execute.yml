@@ -1,0 +1,33 @@
+name: Execute Project
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v4
+        with:
+          path: project
+
+      - name: Checkout core
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/automation-core
+          path: core
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run project
+        env:
+          ALL_SECRETS: ${{ toJSON(secrets) }}
+        run: node core/runner.js
